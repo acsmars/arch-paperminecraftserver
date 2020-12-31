@@ -70,10 +70,10 @@ fi
 minecraft_java_url=$(rcurl.sh https://www.minecraft.net/en-us/download/server | awk '/minecraft-version/,/<\/div>/' | grep -Po -m 1 'https://launcher.mojang.com[^"]+')
 
 # download compiled minecraft java server
-rcurl.sh -o "/tmp/minecraft_server.jar" "${minecraft_java_url}"
+rcurl.sh -o "/tmp/paper.jar" "https://papermc.io/api/v2/projects/paper/versions/1.16.4/builds/354/downloads/paper-1.16.4-354.jar"
 
 # move minecraft java server
-mkdir -p "/srv/minecraft" && mv "/tmp/minecraft_server.jar" "/srv/minecraft/"
+mkdir -p "/srv/minecraft" && mv "/tmp/paper.jar" "/srv/minecraft/"
 
 # container perms
 ####
