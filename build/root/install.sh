@@ -35,7 +35,7 @@ fi
 ####
 
 # define pacman packages
-pacman_packages="jre11-openjdk-headless screen rsync"
+pacman_packages="jre8-openjdk-headless jre11-openjdk-headless screen rsync"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -202,9 +202,38 @@ if [[ "${ENABLE_WEBUI_CONSOLE}" == "yes" ]]; then
 		echo "[info] WEBUI_CONSOLE_TITLE defined as '${WEBUI_CONSOLE_TITLE}'" | ts '%Y-%m-%d %H:%M:%.S'
 	else
 		echo "[info] WEBUI_CONSOLE_TITLE not defined,(via -e WEBUI_CONSOLE_TITLE), defaulting to 'Minecraft Java'" | ts '%Y-%m-%d %H:%M:%.S'
-		export WEBUI_CONSOLE_TITLE="Minecraft Bedrock"
+		export WEBUI_CONSOLE_TITLE="Minecraft Java"
 	fi
 fi
+
+export CUSTOM_JAR_PATH=$(echo "${CUSTOM_JAR_PATH}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${CUSTOM_JAR_PATH}" ]]; then
+	echo "[info] CUSTOM_JAR_PATH defined as '${CUSTOM_JAR_PATH}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[info] CUSTOM_JAR_PATH not defined,(via -e CUSTOM_JAR_PATH), defaulting to '/config/minecraft/minecraft_server.jar' (Mojang Minecraft Java)" | ts '%Y-%m-%d %H:%M:%.S'
+	export CUSTOM_JAR_PATH="/config/minecraft/minecraft_server.jar"
+fi
+
+export JAVA_VERSION=$(echo "${JAVA_VERSION}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${JAVA_VERSION}" ]]; then
+	echo "[info] JAVA_VERSION defined as '${JAVA_VERSION}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[info] JAVA_VERSION not defined,(via -e JAVA_VERSION), defaulting to '8'" | ts '%Y-%m-%d %H:%M:%.S'
+	export JAVA_VERSION="8"
+fi
+
+if [[ "${JAVA_VERSION}" == "8" ]]; then
+	ln -fs /usr/lib/jvm/java-8-openjdk/jre/bin/java /usr/bin/java
+	archlinux-java set java-8-openjdk/jre
+elif [[ "${JAVA_VERSION}" == "11" ]]; then
+	ln -fs /usr/lib/jvm/java-11-openjdk/bin/java /usr/bin/java
+	archlinux-java set java-11-openjdk
+else
+	echo "[warn] Java version '${JAVA_VERSION}' not installed, defaulting to Java version 8" | ts '%Y-%m-%d %H:%M:%.S'
+	ln -fs /usr/lib/jvm/java-8-openjdk/jre/bin/java /usr/bin/java
+	archlinux-java set java-8-openjdk/jre
+fi
+export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
 
 export JAVA_INITIAL_HEAP_SIZE=$(echo "${JAVA_INITIAL_HEAP_SIZE}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 if [[ ! -z "${JAVA_INITIAL_HEAP_SIZE}" ]]; then
@@ -228,6 +257,13 @@ if [[ ! -z "${JAVA_MAX_THREADS}" ]]; then
 else
 	echo "[info] JAVA_MAX_THREADS not defined,(via -e JAVA_MAX_THREADS), defaulting to '1'" | ts '%Y-%m-%d %H:%M:%.S'
 	export JAVA_MAX_THREADS="1"
+fi
+
+export STARTUP_CMD=$(echo "${STARTUP_CMD}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
+if [[ ! -z "${STARTUP_CMD}" ]]; then
+	echo "[info] STARTUP_CMD defined as '${STARTUP_CMD}'" | ts '%Y-%m-%d %H:%M:%.S'
+else
+	echo "[info] STARTUP_CMD not defined (via -e STARTUP_CMD)" | ts '%Y-%m-%d %H:%M:%.S'
 fi
 
 EOF
