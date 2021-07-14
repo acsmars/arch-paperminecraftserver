@@ -1,4 +1,4 @@
-FROM binhex/arch-base:latest
+FROM archlinux:base-devel-20210131.0.14634
 LABEL org.opencontainers.image.authors="binhex"
 
 # additional files
