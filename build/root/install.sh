@@ -46,7 +46,7 @@ fi
 ####
 
 # define aur packages
-aur_packages=""
+aur_packages="java-openjdk-bin"
 
 # call aur install script (arch user repo)
 source aur.sh
@@ -64,13 +64,25 @@ fi
 # custom
 ####
 
-# determine download url for minecraft java server from minecraft.net
-# use awk to match start and end of tags
-# grep to perl regex match download url
-minecraft_java_url=$(rcurl.sh https://www.minecraft.net/en-us/download/server | awk '/minecraft-version/,/<\/div>/' | grep -Po -m 1 'https://launcher.mojang.com[^"]+')
+# identify minecraft version type
+version_type=$(rcurl.sh -s 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json' | jq -r .versions[0].type)
+
+if [[ "${version_type}" != "release" ]]; then
+	echo "[crit] Minecraft Java version type '${version_type}' is != to 'release', exiting script..."
+	exit 1
+fi
+
+# identify minecraft version id (version)
+version_id=$(rcurl.sh -s 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json' | jq -r .versions[0].id)
+echo "[info] Minecraft Java version id is '${version_id}'"
+
+# identify minecraft version  url
+version_url=$(rcurl.sh -s 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json' | jq -r .versions[0].url)
+url=$(rcurl.sh -s "${version_url}" | jq -r .downloads.server.url)
+echo "[info] Minecraft Java Version URL is '${url}'"
 
 # download compiled minecraft java server
-rcurl.sh -o "/tmp/paper.jar" "https://papermc.io/api/v2/projects/paper/versions/1.16.4/builds/354/downloads/paper-1.16.4-354.jar"
+rcurl.sh -o "/tmp/paper.jar" "https://papermc.io/api/v2/projects/paper/versions/1.16.5/builds/782/downloads/paper-1.16.5-782.jar"
 
 # move minecraft java server
 mkdir -p "/srv/minecraft" && mv "/tmp/paper.jar" "/srv/minecraft/"
@@ -78,7 +90,7 @@ mkdir -p "/srv/minecraft" && mv "/tmp/paper.jar" "/srv/minecraft/"
 # container perms
 ####
 
-# define comma separated list of paths 
+# define comma separated list of paths
 install_paths="/srv/minecraft,/home/nobody"
 
 # split comma separated string into list for install paths
@@ -108,7 +120,7 @@ cat <<EOF > /tmp/permissions_heredoc
 previous_puid=\$(cat "/root/puid" 2>/dev/null || true)
 previous_pgid=\$(cat "/root/pgid" 2>/dev/null || true)
 
-# if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different 
+# if first run (no puid or pgid files in /tmp) or the PUID or PGID env vars are different
 # from the previous run then re-apply chown with current PUID and PGID values.
 if [[ ! -f "/root/puid" || ! -f "/root/pgid" || "\${previous_puid}" != "\${PUID}" || "\${previous_pgid}" != "\${PGID}" ]]; then
 
@@ -228,6 +240,9 @@ if [[ "${JAVA_VERSION}" == "8" ]]; then
 elif [[ "${JAVA_VERSION}" == "11" ]]; then
 	ln -fs /usr/lib/jvm/java-11-openjdk/bin/java /usr/bin/java
 	archlinux-java set java-11-openjdk
+elif [[ "${JAVA_VERSION}" == "16" ]]; then
+	ln -fs /usr/lib/jvm/java-16-openjdk/bin/java /usr/bin/java
+	archlinux-java set java-16-openjdk
 else
 	echo "[warn] Java version '${JAVA_VERSION}' not installed, defaulting to Java version 8" | ts '%Y-%m-%d %H:%M:%.S'
 	ln -fs /usr/lib/jvm/java-8-openjdk/jre/bin/java /usr/bin/java
