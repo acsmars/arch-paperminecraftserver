@@ -35,7 +35,7 @@ fi
 ####
 
 # define pacman packages
-pacman_packages="jre11-openjdk-headless screen rsync"
+pacman_packages="jre16-openjdk-headless screen rsync"
 
 # install compiled packages using pacman
 if [[ ! -z "${pacman_packages}" ]]; then
@@ -230,8 +230,8 @@ export JAVA_VERSION=$(echo "${JAVA_VERSION}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 if [[ ! -z "${JAVA_VERSION}" ]]; then
 	echo "[info] JAVA_VERSION defined as '${JAVA_VERSION}'" | ts '%Y-%m-%d %H:%M:%.S'
 else
-	echo "[info] JAVA_VERSION not defined,(via -e JAVA_VERSION), defaulting to '8'" | ts '%Y-%m-%d %H:%M:%.S'
-	export JAVA_VERSION="8"
+	echo "[info] JAVA_VERSION not defined,(via -e JAVA_VERSION), defaulting to '16'" | ts '%Y-%m-%d %H:%M:%.S'
+	export JAVA_VERSION="16"
 fi
 
 if [[ "${JAVA_VERSION}" == "8" ]]; then
