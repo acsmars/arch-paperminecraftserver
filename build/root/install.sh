@@ -125,7 +125,7 @@ rm /tmp/permissions_heredoc
 # env vars
 ####
 
-cat <<'EOF' > /tmp/envvars_heredoc
+#cat <<'EOF' > /tmp/envvars_heredoc
 
 export CREATE_BACKUP_HOURS=$(echo "${CREATE_BACKUP_HOURS}" | sed -e 's~^[ \t]*~~;s~[ \t]*$~~')
 if [[ ! -z "${CREATE_BACKUP_HOURS}" ]]; then
@@ -220,13 +220,10 @@ if [[ "${JAVA_VERSION}" == "8" ]]; then
 elif [[ "${JAVA_VERSION}" == "11" ]]; then
 	ln -fs /usr/lib/jvm/java-11-openjdk/bin/java /usr/bin/java
 	archlinux-java set java-11-openjdk
-elif [[ "${JAVA_VERSION}" == "16" ]]; then
+else
+	echo "[warn] Java version '${JAVA_VERSION}' not installed, defaulting to Java version 16" | ts '%Y-%m-%d %H:%M:%.S'
 	ln -fs /usr/lib/jvm/java-16-openjdk/bin/java /usr/bin/java
 	archlinux-java set java-16-openjdk
-else
-	echo "[warn] Java version '${JAVA_VERSION}' not installed, defaulting to Java version 8" | ts '%Y-%m-%d %H:%M:%.S'
-	ln -fs /usr/lib/jvm/java-8-openjdk/jre/bin/java /usr/bin/java
-	archlinux-java set java-8-openjdk/jre
 fi
 export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")
 
