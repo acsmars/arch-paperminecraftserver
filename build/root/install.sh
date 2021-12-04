@@ -61,28 +61,8 @@ elif [[ "${OS_ARCH}" == "aarch64" ]]; then
 	github.sh --install-path /usr/bin --github-owner yudai --github-repo gotty --download-assets gotty_linux_arm.tar.gz
 fi
 
-# custom
-####
-
-# identify minecraft version type
-version_type=$(rcurl.sh -s 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json' | jq -r .versions[0].type)
-
-if [[ "${version_type}" != "release" ]]; then
-	echo "[crit] Minecraft Java version type '${version_type}' is != to 'release', exiting script..."
-	exit 1
-fi
-
-# identify minecraft version id (version)
-version_id=$(rcurl.sh -s 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json' | jq -r .versions[0].id)
-echo "[info] Minecraft Java version id is '${version_id}'"
-
-# identify minecraft version  url
-version_url=$(rcurl.sh -s 'https://launchermeta.mojang.com/mc/game/version_manifest_v2.json' | jq -r .versions[0].url)
-url=$(rcurl.sh -s "${version_url}" | jq -r .downloads.server.url)
-echo "[info] Minecraft Java Version URL is '${url}'"
-
 # download compiled minecraft java server
-rcurl.sh -o "/tmp/paper.jar" "https://papermc.io/api/v2/projects/paper/versions/1.16.5/builds/782/downloads/paper-1.16.5-782.jar"
+rcurl.sh -o "/tmp/paper.jar" "https://papermc.io/api/v2/projects/paper/versions/1.17.1/builds/391/downloads/paper-1.17.1-391.jar"
 
 # move minecraft java server
 mkdir -p "/srv/minecraft" && mv "/tmp/paper.jar" "/srv/minecraft/"

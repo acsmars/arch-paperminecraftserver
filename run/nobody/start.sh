@@ -64,17 +64,6 @@ if [ ! -f "/config/minecraft/server.properties" ]; then
 	if [[ -d "/srv/minecraft" ]]; then
 		cp -R /srv/minecraft/* /config/minecraft/ 2>/dev/null || true
 	fi
-
-else
-
-	# rsync options defined as follows:-
-	# -r = recursive copy to destination
-	# -l = copy source symlinks as symlinks on destination
-	# -t = keep source modification times for destination files/folders
-	# -p = keep source permissions for destination files/folders
-	echo "[info] Minecraft folder '/config/minecraft' already exists, rsyncing newer files..."
-	rsync -rltp --exclude 'world' --exclude '/server.properties' --exclude '/*.json' /srv/minecraft/ /config/minecraft
-
 fi
 
 # accept eula
